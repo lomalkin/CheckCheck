@@ -2,6 +2,8 @@
 
 . ./config.sh
 
+cd "$(dirname "$0")"
+
 echo "Using $DEVICE"
 
 scan () {
