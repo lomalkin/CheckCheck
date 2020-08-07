@@ -31,12 +31,15 @@ checkcheck () {
 # Исключаем ссылки, начинающиеся с http[s]
 # Строка в чеке всегда содержит символы "&" или "="
 
-time cat "$DATA_DIR/"* | grep "QR-Code" | awk -F':' '{ print $5 }' | grep -iv "^http." | grep "&" | sort | uniq | checkcheck
+#time cat "$DATA_DIR/"* | grep "QR-Code" | awk -F':' '{ print $5 }' | grep -iv "^http." | grep "&" | sort | uniq | checkcheck
+time awk -F':' '/QR-Code/ { print $5 }' "$DATA_DIR/"* | grep -iv "^http." | grep "&" | sort | uniq | checkcheck
 
-for FILE in `find "$CACHE_DIR" -type f -name *.txt`
+TOTAL=0
+for FILE in $(find "$CACHE_DIR" -type f -name "*.txt")
 do
     DATE=$(echo $FILE | awk -F'/' '{ print $2 }' | awk -F'.' '{ print $1 }')
     SUM=$(awk '{ sum += $1 } END { print sum }' "$FILE")
+    TOTAL=$(echo $TOTAL+$SUM | bc)
     echo -e "$DATE\t$SUM" >> "$CACHE_DIR"/"report.txt"
 done
 echo
@@ -47,3 +50,5 @@ echo -e "Processed scans:\t$COUNT"
 echo
 echo "Report:"
 cat "$CACHE_DIR"/"report.txt" | sort
+echo
+echo "Total: $TOTAL"
